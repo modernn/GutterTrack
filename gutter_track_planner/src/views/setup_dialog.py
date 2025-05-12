@@ -4,9 +4,12 @@ import sys
 from models.track import LengthValue, Track
 
 class FeetInchesInput(ft.Row):
-    """Custom input for feet and inches."""
+    def _get_control_name(self):
+        return "feet-inches-input"
     
     def __init__(self, label, on_change=None, default_feet=0, default_inches=0):
+        super().__init__()
+        
         self.feet_field = ft.TextField(
             label="Feet",
             width=80,
@@ -26,25 +29,22 @@ class FeetInchesInput(ft.Row):
         self.feet_field.on_change = self._on_field_change
         self.inches_field.on_change = self._on_field_change
         
-        super().__init__(
-            controls=[
-                ft.Text(label, width=100),
-                self.feet_field,
-                ft.Text("feet"),
-                self.inches_field,
-                ft.Text("inches"),
-            ],
-            alignment="start",
-        )
+        # Set controls
+        self.controls = [
+            ft.Text(label, width=100),
+            self.feet_field,
+            ft.Text("feet"),
+            self.inches_field,
+            ft.Text("inches"),
+        ]
+        self.alignment = "start"
     
     def _on_field_change(self, e):
-        """Handle changes to the feet/inches fields."""
         if self.on_change_callback:
             self.on_change_callback(self.value)
     
     @property
     def value(self):
-        """Get the current value as a LengthValue."""
         try:
             feet = int(self.feet_field.value or 0)
             inches = float(self.inches_field.value or 0)
@@ -54,10 +54,11 @@ class FeetInchesInput(ft.Row):
 
 
 class SetupDialog(ft.AlertDialog):
-    """Initial setup dialog for track dimensions."""
+    def _get_control_name(self):
+        return "setup-dialog"
     
     def __init__(self, on_confirmed):
-        # Set reasonable defaults
+        # Create fields with default values
         self.width_input = FeetInchesInput("Width:", default_feet=4, default_inches=0)
         self.depth_input = FeetInchesInput("Depth:", default_feet=8, default_inches=0)
         self.lane_width_input = FeetInchesInput("Lane Width:", default_feet=0, default_inches=2)
@@ -85,55 +86,32 @@ class SetupDialog(ft.AlertDialog):
         )
     
     def _on_cancel(self, e):
-        """Handle cancel button click."""
-        print("Cancel clicked")
         self.open = False
         self.update()
     
     def _on_confirm(self, e):
-        """Handle confirm button click."""
-        try:
-            print("Confirm clicked")
-            
-            # Validate inputs
-            width = self.width_input.value
-            print(f"Width: {width.feet}' {width.inches}\"")
-            
-            depth = self.depth_input.value
-            print(f"Depth: {depth.feet}' {depth.inches}\"")
-            
-            lane_width = self.lane_width_input.value
-            print(f"Lane Width: {lane_width.feet}' {lane_width.inches}\"")
-            
-            # Ensure lane width is at least 2 inches
-            if lane_width.total_inches < 2:
-                print("Lane width too small, setting to 2 inches")
-                lane_width = LengthValue(0, 2)
-            
-            # Create track model
-            print("Creating track model")
-            track = Track(width, depth, lane_width)
-            
-            # Store track and callback locally before closing dialog
-            callback = self.on_confirmed_callback
-            track_model = track
-            
-            # Close dialog FIRST
-            print("Closing dialog")
-            self.open = False
-            self.update()
-            
-            # Use a simple function to defer the callback execution
-            def do_callback():
-                print("Executing callback")
-                if callback:
-                    callback(track_model)
-            
-            # Defer execution to allow dialog to fully close
-            import asyncio
-            loop = asyncio.get_event_loop()
-            loop.call_soon(do_callback)
-            
-        except Exception as e:
-            error_msg = f"Error in dialog confirm: {str(e)}\n{traceback.format_exc()}"
-            print(error_msg, file=sys.stderr)
+        # Get values
+        width = self.width_input.value
+        depth = self.depth_input.value
+        lane_width = self.lane_width_input.value
+        
+        # Create track
+        track = Track(width, depth, lane_width)
+        
+        # Store callback for execution after dialog closes
+        callback = self.on_confirmed_callback
+        track_obj = track
+        
+        # Close dialog first
+        self.open = False
+        self.update()
+        
+        # Use deferred execution for callback
+        def do_callback():
+            if callback:
+                callback(track_obj)
+        
+        # Schedule callback after dialog closes
+        import asyncio
+        loop = asyncio.get_event_loop()
+        loop.call_soon(do_callback)
