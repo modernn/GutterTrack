@@ -1,81 +1,112 @@
-# GutterTrackPlanner app
+# GutterTrack Designer
 
-## Run the app
+A mobile-first progressive web app (PWA) for designing indoor RC tracks using standard 2" × 2" downspout gutter pieces. Built with Flet, which compiles to Flutter for smooth drag-and-drop interactions and packages to a PWA with one command.
 
-### uv
+![GutterTrack Designer Logo](https://via.placeholder.com/300x150?text=GutterTrack+Designer)
 
-Run as a desktop app:
+## Features
 
-```
-uv run flet run
-```
+- **Enter dimensions** - Specify overall track width × depth and minimum lane width
+- **Grid & snapping** - Snap-to grid ensures perfect piece alignment
+- **Drag-and-drop parts** - Includes variable-length straights, elbows (22.5°, 45°, 90°), and T-fittings
+- **Live bill of materials** - Instant updates showing materials needed for your track
+- **Offline & installable** - Works with no network after first visit
+- **One-click deploy** - Easy deployment to any static host
 
-Run as a web app:
+## Installation
 
-```
-uv run flet run --web
-```
+### Prerequisites
 
-### Poetry
+- Python 3.7+
+- Flet 0.28.2
 
-Install dependencies from `pyproject.toml`:
-
-```
-poetry install
-```
-
-Run as a desktop app:
-
-```
-poetry run flet run
+```bash
+# Install dependencies
+pip install flet==0.28.2
 ```
 
-Run as a web app:
+### Running locally
 
-```
-poetry run flet run --web
-```
+```bash
+# Clone the repository
+git clone https://github.com/modernn/GutterTrack.git
+cd GutterTrack/gutter_track_planner
 
-For more details on running the app, refer to the [Getting Started Guide](https://flet.dev/docs/getting-started/).
-
-## Build the app
-
-### Android
-
-```
-flet build apk -v
+# Run the app
+python main.py
 ```
 
-For more details on building and signing `.apk` or `.aab`, refer to the [Android Packaging Guide](https://flet.dev/docs/publish/android/).
+### Building for web
 
-### iOS
-
-```
-flet build ipa -v
-```
-
-For more details on building and signing `.ipa`, refer to the [iOS Packaging Guide](https://flet.dev/docs/publish/ios/).
-
-### macOS
-
-```
-flet build macos -v
+```bash
+# Package as PWA
+flet pack main.py --pwa
 ```
 
-For more details on building macOS package, refer to the [macOS Packaging Guide](https://flet.dev/docs/publish/macos/).
+This will generate a `build` directory with the compiled PWA that can be deployed to any static hosting service.
 
-### Linux
+## Usage
+
+1. **Launch the app** and enter your track dimensions in the setup dialog
+2. **Select a piece type** from the palette at the bottom/side of the screen
+3. **Click on the grid** to place pieces
+4. **Select existing pieces** to rotate or modify their properties
+5. **View the bill of materials** to see what parts you need to order
+6. **Save your track** for later use, or export it to share with others
+
+## Technology Stack
+
+| Layer | Tech | Reason |
+|-------|------|--------|
+| UI & PWA | Flet (Flutter-powered) | Native-grade touch, single Python codebase, sub-5 MB web build |
+| UI Components | Flutter Containers, Rows, Columns | High-performance layout with responsive design |
+| Snap logic | Grid-based cell calculation | Keeps lanes uniformly wide |
+| BOM API | Internal Python calculation | Fast, type-safe calculation of required materials |
+| Hosting | Any static host + PWA | Simple deployment and global edge caching |
+
+## Project Structure
 
 ```
-flet build linux -v
+gutter_track_planner/
+├── main.py           # Main application entry point
+├── models.py         # Data models for Track, Piece, BOM, etc.
+├── views.py          # UI components
+├── utils.py          # Helper functions
+├── persistence.py    # Track saving and loading
+├── api.py            # BOM calculation API
+└── README.md         # Documentation
 ```
 
-For more details on building Linux package, refer to the [Linux Packaging Guide](https://flet.dev/docs/publish/linux/).
+## Technical Considerations
 
-### Windows
+This project has been carefully designed to work with Flet 0.28.2, which has several important constraints:
+
+- No `ft.Canvas` support (visualization uses containers instead)
+- All custom controls must implement a `_get_control_name()` method
+- Special handling for dialog callbacks using deferred execution
+- Mobile-first approach with responsive layouts
+
+## Development Roadmap
+
+- [ ] Add support for curved pieces
+- [ ] Implement actual drag-and-drop (currently uses click-to-place)
+- [ ] Add 3D visualization option
+- [ ] Support track elevation changes
+- [ ] Add track validation to check for impossible layouts
+
+## Why It Matters
+
+- **Mobile usability first** - Optimized for touch and installs like a native app on iOS/Android
+- **Accurate materials planning** - Uses real gutter part SKUs to remove guesswork and reduce over-ordering
+- **Zero learning curve** - Imperial units everywhere and a Lego-style interface make it approachable for hobbyists
+- **Future-proof** - The same codebase can later be wrapped as an APK/IPA if needed
+
+## License
+
+MIT License - See LICENSE file for details.
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ```
-flet build windows -v
-```
-
-For more details on building Windows package, refer to the [Windows Packaging Guide](https://flet.dev/docs/publish/windows/).
