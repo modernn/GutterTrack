@@ -10,26 +10,32 @@ from views.draggable_piece import DraggablePiece
 class TrackCanvas(ft.Control):  # Changed from ft.UserControl
     """Main canvas for track design."""
     
-    def __init__(self, track):
-        """
-        Initialize the track canvas.
-        
-        Args:
-            track (Track): The track model
-        """
-        super().__init__()
-        self.track = track
-        self.scale = 1.0
-        self.offset_x = 0
-        self.offset_y = 0
-        self.dragging = False
-        self.last_pos = (0, 0)
-        self.selected_piece = None
-        self.is_validating = False
-        self.invalid_positions = []
-        
-        # Track the draggable pieces
-        self.draggable_pieces = []
+def __init__(self, track):
+    """
+    Initialize the track canvas.
+    
+    Args:
+        track (Track): The track model
+    """
+    super().__init__()
+    self.track = track
+    self.scale = 1.0
+    self.offset_x = 0
+    self.offset_y = 0
+    self.dragging = False
+    self.last_pos = (0, 0)
+    self.selected_piece = None
+    self.is_validating = False
+    self.invalid_positions = []
+    
+    # Default size values to prevent errors
+    self.width = 800
+    self.height = 600
+    
+    # Track the draggable pieces
+    self.draggable_pieces = []
+    
+    print(f"TrackCanvas initialized with track dimensions: {track.width} × {track.depth}")
     
     def build(self):
         """Build the canvas widget."""

@@ -27,16 +27,21 @@ def is_position_valid(track, piece, position):
     Returns:
         bool: True if valid, False otherwise
     """
-    # Check if position is within track bounds
-    width_grid = track.width.total_inches / track.lane_width.total_inches
-    depth_grid = track.depth.total_inches / track.lane_width.total_inches
-    
-    x, y = position
-    
-    # Simple boundary check for now
-    if x < 0 or x > width_grid or y < 0 or y > depth_grid:
+    try:
+        # Check if position is within track bounds
+        width_grid = track.width.total_inches / track.lane_width.total_inches
+        depth_grid = track.depth.total_inches / track.lane_width.total_inches
+        
+        x, y = position
+        
+        # Simple boundary check for now
+        if x < 0 or x > width_grid or y < 0 or y > depth_grid:
+            return False
+        
+        # For now, just return True for all placements within bounds
+        # We'll implement the full lane width validation later
+        return True
+    except Exception as e:
+        # Log the error but return False for safety
+        print(f"Error validating position: {e}")
         return False
-    
-    # For now, just return True for all placements within bounds
-    # We'll implement the full lane width validation later
-    return True

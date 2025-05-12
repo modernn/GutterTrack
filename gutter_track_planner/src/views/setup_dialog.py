@@ -10,13 +10,13 @@ class FeetInchesInput(ft.Row):
         self.feet_field = ft.TextField(
             label="Feet",
             width=80,
-            keyboard_type="number",  # Changed from ft.KeyboardType.NUMBER
+            keyboard_type="number",
             value=str(default_feet),
         )
         self.inches_field = ft.TextField(
             label="Inches",
             width=80,
-            keyboard_type="number",  # Changed from ft.KeyboardType.NUMBER
+            keyboard_type="number",
             value=str(default_inches),
         )
         
@@ -34,7 +34,7 @@ class FeetInchesInput(ft.Row):
                 self.inches_field,
                 ft.Text("inches"),
             ],
-            alignment="start",  # Changed from ft.MainAxisAlignment.START
+            alignment="start",
         )
     
     def _on_field_change(self, e):
@@ -75,13 +75,13 @@ class SetupDialog(ft.AlertDialog):
                 ],
                 width=400,
                 height=200,
-                scroll="auto",  # Changed from ft.ScrollMode.AUTO
+                scroll="auto",
             ),
             actions=[
                 ft.TextButton("Cancel", on_click=self._on_cancel),
                 ft.TextButton("Confirm", on_click=self._on_confirm),
             ],
-            actions_alignment="end",  # Changed from ft.MainAxisAlignment.END
+            actions_alignment="end",
         )
     
     def _on_cancel(self, e):
@@ -97,13 +97,13 @@ class SetupDialog(ft.AlertDialog):
             
             # Validate inputs
             width = self.width_input.value
-            print(f"Width: {width}")
+            print(f"Width: {width.feet}' {width.inches}\"")
             
             depth = self.depth_input.value
-            print(f"Depth: {depth}")
+            print(f"Depth: {depth.feet}' {depth.inches}\"")
             
             lane_width = self.lane_width_input.value
-            print(f"Lane Width: {lane_width}")
+            print(f"Lane Width: {lane_width.feet}' {lane_width.inches}\"")
             
             # Ensure lane width is at least 2 inches
             if lane_width.total_inches < 2:
@@ -114,16 +114,25 @@ class SetupDialog(ft.AlertDialog):
             print("Creating track model")
             track = Track(width, depth, lane_width)
             
-            # Close dialog first
+            # Store track and callback locally before closing dialog
+            callback = self.on_confirmed_callback
+            track_model = track
+            
+            # Close dialog FIRST
             print("Closing dialog")
             self.open = False
             self.update()
             
-            # Call the callback AFTER dialog is closed
-            print("Calling callback")
-            if self.on_confirmed_callback:
-                self.on_confirmed_callback(track)
-            print("Callback completed")
+            # Use a simple function to defer the callback execution
+            def do_callback():
+                print("Executing callback")
+                if callback:
+                    callback(track_model)
+            
+            # Defer execution to allow dialog to fully close
+            import asyncio
+            loop = asyncio.get_event_loop()
+            loop.call_soon(do_callback)
             
         except Exception as e:
             error_msg = f"Error in dialog confirm: {str(e)}\n{traceback.format_exc()}"
