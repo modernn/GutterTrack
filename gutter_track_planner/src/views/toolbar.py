@@ -4,6 +4,9 @@ from models.piece import PieceType, StraightPiece, ElbowPiece, TeePiece
 class PieceToolbar(ft.Control):  # Changed from ft.UserControl
     """Toolbar for selecting track pieces."""
     
+    def _get_control_name(self):
+        return "toolbar" 
+    
     def __init__(self, on_piece_selected):
         """
         Initialize the toolbar.

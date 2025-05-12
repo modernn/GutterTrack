@@ -10,6 +10,10 @@ from views.draggable_piece import DraggablePiece
 class TrackCanvas(ft.Control):  # Changed from ft.UserControl
     """Main canvas for track design."""
     
+    
+def _get_control_name(self):
+    return "canvas"  # This method is required in Flet 0.28.2
+
 def __init__(self, track):
     """
     Initialize the track canvas.

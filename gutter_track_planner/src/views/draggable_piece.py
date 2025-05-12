@@ -5,6 +5,9 @@ from utils.grid import snap_to_grid, is_position_valid
 class DraggablePiece(ft.Control):  # Changed from ft.UserControl
     """Draggable representation of a track piece."""
     
+    def _get_control_name(self):
+        return "draggable-piece" 
+    
     def __init__(self, piece, on_position_changed):
         """
         Initialize a draggable piece.
